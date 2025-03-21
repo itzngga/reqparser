@@ -32,6 +32,10 @@ func (p *Parser[T]) parseAll() (v T, err error) {
 			return v, NewCommonError(p.toSnakeCase(p.k), "NOT_BLANK")
 		}
 
+		if !p.r && val == "" {
+			return
+		}
+
 		return p.parseType(val)
 	// parse keyquery type
 	case "keyquery":
@@ -40,12 +44,20 @@ func (p *Parser[T]) parseAll() (v T, err error) {
 			return v, NewCommonError(p.toSnakeCase(p.k), "NOT_BLANK")
 		}
 
+		if !p.r && val == "" {
+			return
+		}
+
 		return p.parseType(val)
 	// parse params type
 	case "params":
 		val := p.c.Params(p.k)
 		if p.r && val == "" {
 			return v, NewCommonError(p.toSnakeCase(p.k), "NOT_BLANK")
+		}
+
+		if !p.r && val == "" {
+			return
 		}
 
 		return p.parseType(val)
