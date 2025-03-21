@@ -13,20 +13,21 @@ type FiberInterface interface {
 	Query(key string, defaultValue ...string) string
 	FormFile(key string) (*multipart.FileHeader, error)
 }
-
 type RulesFunc func() RuleSet
 
 type RuleSet struct {
-	t string // type of parser
-	k string // key body/query/params
-	r *bool  // required or not
+	t   string   // type of parser
+	k   string   // key body/query/params
+	r   *bool    // required or not
+	ext []string // file extension for file saving
 }
 
 type Parser[T any] struct { // target interface
-	c FiberInterface // fiber context
-	t string         // type of parser
-	k string         // key body/query/params
-	r bool           // required or not
+	c   FiberInterface // fiber context
+	t   string         // type of parser
+	k   string         // key body/query/params
+	r   bool           // required or not
+	ext []string       // file extension for file saving
 }
 
 func New[T any](c FiberInterface) *Parser[T] {
@@ -50,6 +51,9 @@ func (p *Parser[T]) Parse(rules ...RulesFunc) (v T, err error) {
 		}
 		if rule.r != nil {
 			p.r = *rule.r
+		}
+		if rule.ext != nil {
+			p.ext = rule.ext
 		}
 	}
 
@@ -108,6 +112,17 @@ func File(key string, required bool) RulesFunc {
 			t: "fileform",
 			k: key,
 			r: &required,
+		}
+	}
+}
+
+func FileWithExt(key string, required bool, ext []string) RulesFunc {
+	return func() RuleSet {
+		return RuleSet{
+			t:   "fileform",
+			k:   key,
+			r:   &required,
+			ext: ext,
 		}
 	}
 }
