@@ -1,13 +1,20 @@
 package reqparser
 
 type CustomError struct {
+	field   string
 	message string
 }
 
-func (e CustomError) Error() string {
-	return e.message
+func (customError CustomError) Error() string {
+	return customError.message
+}
+
+func (customError CustomError) Parse() map[string]string {
+	str := make(map[string]string)
+	str[customError.field] = customError.message
+	return str
 }
 
 func NewCommonError(field, message string) CustomError {
-	return CustomError{message: `"` + field + `":"` + message + `"`}
+	return CustomError{field, message}
 }
